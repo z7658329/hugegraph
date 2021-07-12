@@ -19,14 +19,42 @@
 
 package com.baidu.hugegraph.api.traversers;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.baidu.hugegraph.api.BaseApiTest;
+import com.google.common.collect.ImmutableMap;
 
 public class ShortestPathApiTest extends BaseApiTest {
 
+    final static String path = "graphs/hugegraph/traversers/shortestpath";
+
+    @Before
+    public void prepareSchema() {
+        BaseApiTest.initPropertyKey();
+        BaseApiTest.initVertexLabel();
+        BaseApiTest.initEdgeLabel();
+        BaseApiTest.initVertex();
+        BaseApiTest.initEdge();
+    }
+
     @Test
     public void testGet() {
-        // TODO
+        Map<String, String> name2Ids = listAllVertexName2Ids();
+        String markoId = name2Ids.get("marko");
+        String joshId = name2Ids.get("vadas");
+        Response r = client().get(path,
+                                  ImmutableMap.of("source", id2Json(markoId),
+                                                  "target", id2Json(joshId),
+                                                  "max_depth", 100));
+        String respBody = assertResponseStatus(200, r);
+        List<String> paths = assertJsonContains(respBody, "path");
+        Assert.assertFalse(paths.isEmpty());
     }
 }

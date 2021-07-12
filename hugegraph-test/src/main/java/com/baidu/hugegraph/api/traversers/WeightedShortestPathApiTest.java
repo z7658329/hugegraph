@@ -29,10 +29,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.baidu.hugegraph.api.BaseApiTest;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
-public class NeighborRankApiTest extends BaseApiTest {
+public class WeightedShortestPathApiTest extends BaseApiTest {
 
-    final static String path = "graphs/hugegraph/traversers/neighborrank";
+    final static String path = "graphs/hugegraph/traversers/" +
+                               "weightedshortestpath";
 
     @Before
     public void prepareSchema() {
@@ -44,17 +47,23 @@ public class NeighborRankApiTest extends BaseApiTest {
     }
 
     @Test
-    public void testNeighborRank() {
+    public void testGet() {
         Map<String, String> name2Ids = listAllVertexName2Ids();
         String markoId = name2Ids.get("marko");
-        String reqBody = String.format("{" +
-                                       "\"source\":\"%s\"," +
-                                       "\"steps\": [{" +
-                                       " \"direction\": \"BOTH\"}]," +
-                                       "\"alpha\":%s}", markoId, 1);
-        Response r = client().post(path, reqBody);
+        String joshId = name2Ids.get("josh");
+        String peterId = name2Ids.get("peter");
+        String rippleId = name2Ids.get("ripple");
+        Response r = client().get(path,
+                                  ImmutableMap.of("source", id2Json(markoId),
+                                                  "target", id2Json(joshId),
+                                                  "weight", "weight",
+                                                  "with_vertex", true));
         String respBody = assertResponseStatus(200, r);
-        List<Double> ranks = assertJsonContains(respBody, "ranks");
-        Assert.assertEquals(2, ranks.size());
+        Map<String, Map> paths = assertJsonContains(respBody,"path");
+        Assert.assertFalse(paths.isEmpty());
+        List<String> expectedVertices = ImmutableList.of(markoId, rippleId,
+                                                         peterId, joshId);
+        List<String> vertices = assertMapContains(paths, "vertices");
+        Assert.assertEquals(expectedVertices, vertices);
     }
 }

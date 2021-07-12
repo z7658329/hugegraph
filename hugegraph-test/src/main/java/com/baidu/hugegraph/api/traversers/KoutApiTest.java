@@ -77,22 +77,21 @@ public class KoutApiTest extends BaseApiTest {
     public void testPost() {
         Map<String, String> name2Ids = listAllVertexName2Ids();
         String markoId = name2Ids.get("marko");
-        String reqBody = String.format("{ "
-                                       + "\"source\": \"%s\", "
-                                       + "\"step\": { "
-                                       + "  \"direction\": \"BOTH\", "
-                                       +
-                                       "  \"labels\": [\"knows\", " +
-                                       "\"created\"], "
-                                       + "  \"properties\": { "
-                                       + "    \"weight\": \"P.gt(0.1)\"}, "
-                                       + "  \"degree\": 10000, "
-                                       + "  \"skip_degree\": 100000}, "
-                                       + "\"max_depth\": 1, "
-                                       + "\"nearest\": true, "
-                                       + "\"limit\": 10000, "
-                                       + "\"with_vertex\": true, "
-                                       + "\"with_path\": true}", markoId);
+        String reqBody = String.format("{ " +
+                                       "\"source\": \"%s\", " +
+                                       "\"step\": { " +
+                                       " \"direction\": \"BOTH\", " +
+                                       " \"labels\": [\"knows\", " +
+                                       " \"created\"], " +
+                                       "\"properties\": { " +
+                                       " \"weight\": \"P.gt(0.1)\"}, " +
+                                       " \"degree\": 10000, " +
+                                       " \"skip_degree\": 100000}, " +
+                                       "\"max_depth\": 1, " +
+                                       "\"nearest\": true, " +
+                                       "\"limit\": 10000, " +
+                                       "\"with_vertex\": true, " +
+                                       "\"with_path\": true}", markoId);
         Response resp = client().post(path, reqBody);
         String respBody = assertResponseStatus(200, resp);
         Map<String, Object> entity = parseMap(respBody);

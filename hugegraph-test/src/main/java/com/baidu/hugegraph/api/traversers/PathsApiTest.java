@@ -67,20 +67,19 @@ public class PathsApiTest extends BaseApiTest {
         Map<String, String> name2Ids = listAllVertexName2Ids();
         String markoId = name2Ids.get("marko");
         String joshId = name2Ids.get("josh");
-        String reqBody = String.format("{ "
-                                       + "\"sources\": { "
-                                       + "  \"ids\": [\"%s\"] "
-                                       + "}, "
-                                       + "\"targets\": { "
-                                       + "  \"ids\": [\"%s\"]}, "
-                                       + "\"step\": { "
-                                       + "  \"direction\": \"BOTH\", "
-                                       + "  \"properties\": { "
-                                       + "    \"weight\": \"P.gt(0.01)\"}}, "
-                                       + "\"max_depth\": 10, "
-                                       + "\"capacity\": 100000000, "
-                                       + "\"limit\": 10000000, "
-                                       + "\"with_vertex\": false}",
+        String reqBody = String.format("{ " +
+                                       "\"sources\": { " +
+                                       " \"ids\": [\"%s\"]}, " +
+                                       "\"targets\": { " +
+                                       " \"ids\": [\"%s\"]}, " +
+                                       "\"step\": { " +
+                                       " \"direction\": \"BOTH\", " +
+                                       " \"properties\": { " +
+                                       "  \"weight\": \"P.gt(0.01)\"}}, " +
+                                       "\"max_depth\": 10, " +
+                                       "\"capacity\": 100000000, " +
+                                       "\"limit\": 10000000, " +
+                                       "\"with_vertex\": false}",
                                        markoId, joshId);
         Response r = client().post(path, reqBody);
         String respBody = assertResponseStatus(200, r);
