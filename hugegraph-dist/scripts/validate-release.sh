@@ -154,6 +154,7 @@ jps | grep HugeGraphServer | awk '{print $1}' | xargs kill -9
 bin/start-hugegraph.sh && ls ../
 cd - || exit
 
+
 #### step5.2: running toolchain
 cd ./*toolchain*"${RELEASE_VERSION}" || exit
 ls -lh
