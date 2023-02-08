@@ -117,7 +117,7 @@ jobs:
           bin/init-store.sh && sleep 1
           bin/start-hugegraph.sh && ls ../../
           cd ../../ || exit
-      - name: Step5.Run Compiled Packages In ToolChain(include loader/tool/hubble)
+      - name: Step6.Run Compiled Packages In ToolChain(Loader/Tool/Hubble)
         run: |
           cd dist/${{ inputs.release_version }}
           cd ./*toolchain*src || exit
@@ -139,34 +139,66 @@ jobs:
           cd ./*hubble*"${RELEASE_VERSION}" || exit
           cat conf/hugegraph-hubble.properties && bin/start-hubble.sh
           cd ../../../ || exit
+          rm -rf ./*src* && ls -lh
           echo "pwd info"
           pwd
-      - name: Test Running Binary5
+      - name: Step7.Validate Binary Packages(Check NOTICE & LICENSE file)
         run: |
-          echo "TODO: separate script to test binary"
-      - name: Test Running Binary5
+          cd dist/${{ inputs.release_version }}
+          for i in *.tar.gz; do
+          echo "$i"
+          if [[ ! "$i" =~ "incubating" ]]; then
+          echo "The package name should include incubating" && exit 1
+          fi
+          tar xzvf "$i" || exit
+        
+          cd "$(basename "$i" .tar.gz)" && ls -lh || exit
+          if [[ ! -f "LICENSE" ]]; then
+          echo "The package should include LICENSE file" && exit 1
+          fi
+          if [[ ! -f "NOTICE" ]]; then
+          echo "The package should include NOTICE file" && exit 1
+          fi
+          # ensure doesn't contains empty directory or file
+          COUNT=$(find . -type d -empty | wc -l)
+          if [[ $COUNT -ne 0 ]]; then
+          find . -type d -empty
+          echo "The package should not include empty directory, but get $COUNT" # TODO: && exit 1
+          fi
+          cd - || exit
+          done
+      - name: Step8.Validate Binary Packages(Start Server)
         run: |
-          echo "TODO: separate script to test binary"
-      - name: Test Running Binary5
+          cd dist/${{ inputs.release_version }}
+          cd ./*hugegraph-incubating*"${RELEASE_VERSION}" || exit
+          bin/init-store.sh && sleep 1
+          # kill the HugeGraphServer process by jps
+          jps | grep HugeGraphServer | awk '{print $1}' | xargs kill -9
+          bin/start-hugegraph.sh && ls ../
+          cd - || exit
+      - name: Step9.Validate Binary Packages(Start ToolChain(Loader/Tool/Hubble))
         run: |
-          echo "TODO: separate script to test binary"
-      - name: Test Running Binary5
-        run: |
-          echo "TODO: separate script to test binary"
-      - name: Test Running Binary5
-        run: |
-          echo "TODO: separate script to test binary"
-      - name: Test Running Binary5
-        run: |
-          echo "TODO: separate script to test binary"
-      - name: Test Running Binary5
-        run: |
-          echo "TODO: separate script to test binary"
-      - name: Test Running Binary5
-        run: |
-          echo "TODO: separate script to test binary"
-      
-
+          cd dist/${{ inputs.release_version }}
+          cd ./*toolchain*"${RELEASE_VERSION}" || exit
+          ls -lh
+          echo "test loader"
+          ##### 5.2.1 test loader
+          cd ./*loader*"${RELEASE_VERSION}" || exit
+          bin/hugegraph-loader.sh -f ./example/file/struct.json -s ./example/file/schema.groovy \
+            -g hugegraph || exit
+          cd - || exit
+          echo "test tool"
+          cd ./*tool*"${RELEASE_VERSION}" || exit
+          bin/hugegraph gremlin-execute --script 'g.V().count()' || exit
+          bin/hugegraph task-list || exit
+          bin/hugegraph backup -t all --directory ./backup-test || exit
+          cd - || exit
+          echo "test hubble"
+          cd ./*hubble*"${RELEASE_VERSION}" || exit
+          # TODO: add hubble doc & test it
+          cat conf/hugegraph-hubble.properties
+          bin/stop-hubble.sh && bin/start-hubble.sh
+          cd - || exit
     strategy:
       fail-fast: false
       matrix:
