@@ -24,6 +24,7 @@ jobs:
       SCRIPT_PATH: hugegraph-dist/scripts/
       URL_PREFIX: https://dist.apache.org/repos/dist/dev/incubator/hugegraph/
       USER: 'Imba Jin'
+      RELEASE_VERSION: #todo parse version
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
