@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SCRIPT_PATH: hugegraph-dist/scripts/
+      URL_PREFIX: https://dist.apache.org/repos/dist/dev/incubator/hugegraph/
+      USER:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
@@ -45,10 +47,37 @@ jobs:
 
 
       # TODO: do we need svn & gpg environment?
-      - name: Test Building Source & Running
+      - name: Download Svn Sources
         run: |
-          bash $SCRIPT_PATH/validate-release.sh ${{ inputs.release_version }} ${{ matrix.java_version }}
-      - name: Test Running Binary
+          rm -rf dist/${{ inputs.release_version }} && svn co ${URL_PREFIX}/${{ inputs.release_version }} dist/${{ inputs.release_version }}
+          cd dist/${{ inputs.release_version }} || exit
+      - name: Check Environment & Import Public Keys
+        run: |
+          shasum --version 1>/dev/null || exit
+          gpg --version 1>/dev/null || exit
+  
+          wget https://downloads.apache.org/incubator/hugegraph/KEYS || exit
+          gpg --import KEYS
+
+          echo -e "5\ny\n" | gpg --batch --command-fd 0 --edit-key $USER trust
+  
+          for key in $(gpg --no-tty --list-keys --with-colons | awk -F: '/^pub/ {print $5}'); 
+          do
+              echo -e "5\ny\n" | gpg --batch --command-fd 0 --edit-key "$key" trust
+          done
+      - name: Test Running Binary1
+        run: |
+          echo "TODO: separate script to test binary"
+      - name: Test Running Binary2
+        run: |
+          echo "TODO: separate script to test binary"
+      - name: Test Running Binary3
+        run: |
+          echo "TODO: separate script to test binary"
+      - name: Test Running Binary4
+        run: |
+          echo "TODO: separate script to test binary"
+      - name: Test Running Binary5
         run: |
           echo "TODO: separate script to test binary"
 
