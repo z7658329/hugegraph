@@ -17,7 +17,7 @@ jobs:
     env:
       SCRIPT_PATH: hugegraph-dist/scripts/
       URL_PREFIX: https://dist.apache.org/repos/dist/dev/incubator/hugegraph/
-      USER:
+      USER: 'Imba Jin'
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
@@ -58,6 +58,8 @@ jobs:
           wget https://downloads.apache.org/incubator/hugegraph/KEYS || exit
           echo "import KEYS"
           gpg --import KEYS
+
+          echo -e "5\ny\n" | gpg --batch --command-fd 0 --edit-key $USER trust
 
           echo "trust all pk"
           for key in $(gpg --no-tty --list-keys --with-colons | awk -F: '/^pub/ {print $5}'); 
