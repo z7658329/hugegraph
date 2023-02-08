@@ -55,6 +55,7 @@ jobs:
           pwd
       - name: Check Environment & Import Public Keys
         run: |
+          cd dist/${{ inputs.release_version }}
           echo "pwd info"
           pwd
           shasum --version 1>/dev/null || exit
