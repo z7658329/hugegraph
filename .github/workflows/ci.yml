@@ -8,7 +8,7 @@ on:
       - 'test-*'
   pull_request:
     branches:
-      - '**'
+      - 'release-*'
 
 jobs:
   build:
