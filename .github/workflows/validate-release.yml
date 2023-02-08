@@ -122,26 +122,24 @@ jobs:
           cd dist/${{ inputs.release_version }}
           cd ./*toolchain*src || exit
           ls -lh
-          cd ./*toolchain*"${RELEASE_VERSION}" || exit
+          cd ./*toolchain*${{ inputs.release_version }} || exit
           ls -lh
           echo "test loader"
-          cd ./*loader*"${RELEASE_VERSION}" || exit
+          cd ./*loader*${{ inputs.release_version }} || exit
           bin/hugegraph-loader.sh -f ./example/file/struct.json -s ./example/file/schema.groovy \
             -g hugegraph || exit
           cd .. || exit
           echo "test tool"
-          cd ./*tool*"${RELEASE_VERSION}" || exit
+          cd ./*tool*${{ inputs.release_version }} || exit
           bin/hugegraph gremlin-execute --script 'g.V().count()' || exit
           bin/hugegraph task-list || exit
           bin/hugegraph backup -t all --directory ./backup-test || exit
           cd .. || exit
           echo "test hubble"
-          cd ./*hubble*"${RELEASE_VERSION}" || exit
+          cd ./*hubble*${{ inputs.release_version }} || exit
           cat conf/hugegraph-hubble.properties && bin/start-hubble.sh
           cd ../../../ || exit
           rm -rf ./*src* && ls -lh
-          echo "pwd info"
-          pwd
       - name: Step7.Validate Binary Packages(Check NOTICE & LICENSE file)
         run: |
           cd dist/${{ inputs.release_version }}
@@ -170,7 +168,7 @@ jobs:
       - name: Step8.Validate Binary Packages(Start Server)
         run: |
           cd dist/${{ inputs.release_version }}
-          cd ./*hugegraph-incubating*"${RELEASE_VERSION}" || exit
+          cd ./*hugegraph-incubating*${{ inputs.release_version }} || exit
           bin/init-store.sh && sleep 1
           # kill the HugeGraphServer process by jps
           jps | grep HugeGraphServer | awk '{print $1}' | xargs kill -9
@@ -179,22 +177,22 @@ jobs:
       - name: Step9.Validate Binary Packages(Start ToolChain(Loader/Tool/Hubble))
         run: |
           cd dist/${{ inputs.release_version }}
-          cd ./*toolchain*"${RELEASE_VERSION}" || exit
+          cd ./*toolchain*${{ inputs.release_version }} || exit
           ls -lh
           echo "test loader"
           ##### 5.2.1 test loader
-          cd ./*loader*"${RELEASE_VERSION}" || exit
+          cd ./*loader*${{ inputs.release_version }} || exit
           bin/hugegraph-loader.sh -f ./example/file/struct.json -s ./example/file/schema.groovy \
             -g hugegraph || exit
           cd - || exit
           echo "test tool"
-          cd ./*tool*"${RELEASE_VERSION}" || exit
+          cd ./*tool*${{ inputs.release_version }} || exit
           bin/hugegraph gremlin-execute --script 'g.V().count()' || exit
           bin/hugegraph task-list || exit
           bin/hugegraph backup -t all --directory ./backup-test || exit
           cd - || exit
           echo "test hubble"
-          cd ./*hubble*"${RELEASE_VERSION}" || exit
+          cd ./*hubble*${{ inputs.release_version }} || exit
           # TODO: add hubble doc & test it
           cat conf/hugegraph-hubble.properties
           bin/stop-hubble.sh && bin/start-hubble.sh
